@@ -14,8 +14,9 @@
     "minimum-stability": "dev",
     "require": {
         "yiisoft/yii2": "*",
-        "mg-code/yii2-base": "*",
-        "mg-code/yii2-jquery-history": "*"
+        "mg-code/yii2-helpers": "*",
+        "bower-asset/history.js": "*",
+        "mg-code/yii2-assets": "*"
     },
     "autoload": {
         "psr-4": {
