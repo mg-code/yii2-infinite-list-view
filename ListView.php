@@ -1,22 +1,23 @@
 <?php
 
 namespace mgcode\infinite;
+
 use mgcode\helpers\ArrayHelper;
 use mgcode\infinite\assets\InfiniteScrollAsset;
 
 class ListView extends \yii\widgets\ListView
 {
-    /** 
+    /**
      * @var bool Whether to enable infinite scroll plugin.
      */
     public $enableClientScript = true;
 
-    /** 
+    /**
      * @var int|null Stop autoloading after certain amount of auto loads.
      */
-    public $stopAfter;
+    public $stopEvery;
 
-    /** 
+    /**
      * @var bool Whether to load page on first view.
      */
     public $autoloadOnFirst = true;
@@ -24,7 +25,6 @@ class ListView extends \yii\widgets\ListView
     /**
      * @var string the layout that determines how different sections of the list view should be organized.
      * The following tokens will be replaced with the corresponding section contents:
-     *
      * - `{pagerTop}`: the pager top. See [[renderPagerTop()]].
      * - `{items}`: the list items. See [[renderItems()]].
      * - `{pager}`: the pager. See [[renderPager()]].
@@ -39,31 +39,12 @@ class ListView extends \yii\widgets\ListView
     public function init()
     {
         parent::init();
-        if(isset($this->options['class']) && $this->options['class']) {
-            $this->options['class'] .= ' infinity-pagination';
-        } else {
-            $this->options['class'] = 'infinity-pagination';
-        }
-
-        if(!$this->autoloadOnFirst) {
-            $this->autoloadOnFirst = (int) \Yii::$app->request->get('page', 1) !== 1;
-        }
-
-        $this->options = array_merge($this->options, [
-            'data-stop-after' => (int) $this->stopAfter,
-            'data-autoload' => (int) $this->autoloadOnFirst
-        ]);
-
-        if($this->enableClientScript) {
-            InfiniteScrollAsset::register($this->getView());
-            $this->getView()->registerJs("$('.infinity-pagination').infiniteScroll();");
-        }
+        $this->initOptions();
     }
 
     /**
      * Renders a section of the specified name.
      * If the named section is not supported, false will be returned.
-     *
      * @param string $name the section name, e.g., `{summary}`, `{items}`.
      * @return string|boolean the rendering result of the section, or false if the named section is not supported.
      */
@@ -78,7 +59,6 @@ class ListView extends \yii\widgets\ListView
 
     /**
      * Renders the pager.
-     *
      * @return string the rendering result
      */
     public function renderPagerTop()
@@ -88,12 +68,11 @@ class ListView extends \yii\widgets\ListView
         ob_start();
         ob_implicit_flush(false);
         $out = $pager ? $this->getPagerInstance()->runTop() : '';
-        return ob_get_clean() . $out;
+        return ob_get_clean().$out;
     }
 
     /**
      * Renders the pager.
-     *
      * @return string the rendering result
      */
     public function renderPager()
@@ -103,13 +82,34 @@ class ListView extends \yii\widgets\ListView
         ob_start();
         ob_implicit_flush(false);
         $out = $pager ? $this->getPagerInstance()->run() : '';
-        return ob_get_clean() . $out;
+        return ob_get_clean().$out;
+    }
+
+    protected function initOptions()
+    {
+        if (isset($this->options['class']) && $this->options['class']) {
+            $this->options['class'] .= ' infinity-pagination';
+        } else {
+            $this->options['class'] = 'infinity-pagination';
+        }
+
+        if ($this->autoloadOnFirst && \Yii::$app->request->get('page', 1) != 1) {
+            $this->autoloadOnFirst = false;
+        }
+
+        $this->options = array_merge($this->options, [
+            'data-stop-every' => $this->stopEvery ? (int) $this->stopEvery : null,
+            'data-autoload-on-first' => (int) $this->autoloadOnFirst,
+        ]);
+
+        InfiniteScrollAsset::register($this->getView());
+        $this->getView()->registerJs("$('.infinity-pagination').infiniteScroll();");
     }
 
     /**
      * @return Pager
      */
-    public function getPagerInstance()
+    protected function getPagerInstance()
     {
         if ($this->_pagerInstance !== null) {
             return $this->_pagerInstance;

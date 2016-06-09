@@ -14,5 +14,6 @@ class InfiniteScrollAsset extends AssetBundle
     public $depends = [
         'yii\web\JqueryAsset',
         'mgcode\assets\HistoryJsAsset',
+        'mgcode\helpers\HelpersAsset',
     ];
 }

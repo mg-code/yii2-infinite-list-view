@@ -10,12 +10,12 @@
         }
     };
 
-    $.fn.infiniteScroll.scrollIsReady = true;
-
+    var scrollIsReady = true;
     var defaults = {
-        stopAfter: 5,
-        autoload: true,
-        clickCounter: 0
+        stopEvery: null,
+        autoloadOnFirst: true,
+        clickCounter: 0,
+        firstLoaded: false
     };
     var methods = {
         init: function (options) {
@@ -29,13 +29,10 @@
 
                 // init settings
                 var settings = $.extend({}, defaults, {
-                        stopAfter: parseInt($e.attr('data-stop-after')),
-                        autoload: $e.attr('data-autoload') == "1"
+                        stopEvery: $e.attr('data-stop-every') ? parseInt($e.attr('data-stop-every')) : null,
+                        autoloadOnFirst: $e.attr('data-autoload-on-first') == "1"
                     } || {});
 
-                if (!settings.autoload) {
-                    settings.clickCounter = settings.stopAfter;
-                }
                 $e.data('settings', settings);
 
                 // Scroll event
@@ -55,21 +52,17 @@
                 timer = null;
 
             $(window).scroll(function () {
-                var settings = settings = $e.data('settings');
+                var settings = $e.data('settings');
 
                 // If scroll is not ready terminate action
-                if (!settings || !$.fn.infiniteScroll.scrollIsReady) {
+                if (!settings || !scrollIsReady) {
                     return;
                 }
 
                 clearTimeout(timer);
                 timer = setTimeout(function () {
                     // If scroll is not ready terminate action
-                    if (!$.fn.infiniteScroll.scrollIsReady) {
-                        return;
-                    }
-
-                    if (settings.clickCounter == settings.stopAfter) {
+                    if (!scrollIsReady) {
                         return;
                     }
 
@@ -83,6 +76,17 @@
                     if (scrollPosition < paginationPosition) {
                         return;
                     }
+
+                    console.log(settings);
+                    if (!settings.autoloadOnFirst && !settings.firstLoaded) {
+                        return;
+                    }
+
+                    if (settings.stopEvery && (settings.clickCounter + 1) % settings.stopEvery == 0) {
+                        return;
+                    }
+
+
                     methods.loadPage.apply($e, [$pagination]);
                 }, 50);
             });
@@ -99,7 +103,7 @@
                 url = $pagination.find('a').attr('href'),
                 isPrev = $pagination.hasClass('prev');
 
-            $.fn.infiniteScroll.scrollIsReady = false;
+            scrollIsReady = false;
             $pagination.addClass('loading');
             $.ajax({
                 url: url,
@@ -139,19 +143,20 @@
                         if (navigationNext) {
                             $itemsContainer.after(navigationNext);
                         }
-                        settings.clickCounter = settings.clickCounter == settings.stopAfter ? 0 : settings.clickCounter + 1;
+                        settings.clickCounter = settings.clickCounter == (settings.stopEvery + 1) ? 0 : settings.clickCounter + 1;
+                        settings.firstLoaded = true;
                     }
 
                     // Update page state
                     methods.replaceState.apply($e, [title, url]);
-                    $.fn.infiniteScroll.scrollIsReady = true;
+                    scrollIsReady = true;
                 },
                 complete: function () {
                     $pagination.removeClass('loading');
                 },
                 error: function (XKR, textStatus, errorThrown) {
-                    $.fn.infiniteScroll.scrollIsReady = false;
-                    ajaxError(XKR, textStatus);
+                    scrollIsReady = false;
+                    mgcode.helpers.request.ajaxError(XKR, textStatus);
                 }
             });
         }
