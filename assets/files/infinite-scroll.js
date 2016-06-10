@@ -40,9 +40,10 @@
 
                 // Button event
                 $e.on('click', '.pagination a', function () {
-                    var $pagination = $(this).parent();
+                    var $pagination = $(this).parent(),
+                        resetCounter = $pagination.hasClass('next');
 
-                    methods.loadPage.apply($e, [$pagination]);
+                    methods.loadPage.apply($e, [$pagination, resetCounter]);
                     return false;
                 });
             });
@@ -66,6 +67,14 @@
                         return;
                     }
 
+                    if (!settings.autoloadOnFirst && !settings.firstLoaded) {
+                        return;
+                    }
+
+                    if (settings.stopEvery && (settings.clickCounter + 1) % settings.stopEvery == 0) {
+                        return;
+                    }
+
                     var $pagination = $e.find('.pagination.next');
                     if ($pagination.length < 1) {
                         return;
@@ -77,16 +86,6 @@
                         return;
                     }
 
-                    console.log(settings);
-                    if (!settings.autoloadOnFirst && !settings.firstLoaded) {
-                        return;
-                    }
-
-                    if (settings.stopEvery && (settings.clickCounter + 1) % settings.stopEvery == 0) {
-                        return;
-                    }
-
-
                     methods.loadPage.apply($e, [$pagination]);
                 }, 50);
             });
@@ -97,11 +96,15 @@
                 History.replaceState(state.data, title, url);
             }
         },
-        loadPage: function ($pagination) {
+        loadPage: function ($pagination, resetCounter) {
             var $e = $(this),
                 settings = $e.data('settings'),
                 url = $pagination.find('a').attr('href'),
                 isPrev = $pagination.hasClass('prev');
+
+            if(typeof resetCounter == 'undefined') {
+                resetCounter = false;
+            }
 
             scrollIsReady = false;
             $pagination.addClass('loading');
@@ -143,7 +146,11 @@
                         if (navigationNext) {
                             $itemsContainer.after(navigationNext);
                         }
-                        settings.clickCounter = settings.clickCounter == (settings.stopEvery + 1) ? 0 : settings.clickCounter + 1;
+                        if(resetCounter) {
+                            settings.clickCounter = 0;
+                        } else {
+                            settings.clickCounter++;
+                        }
                         settings.firstLoaded = true;
                     }
 
