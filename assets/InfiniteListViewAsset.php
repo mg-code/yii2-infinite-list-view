@@ -4,11 +4,11 @@ namespace mgcode\infinite\assets;
 
 use yii\web\AssetBundle;
 
-class InfiniteScrollAsset extends AssetBundle
+class InfiniteListViewAsset extends AssetBundle
 {
     public $sourcePath = '@mgcode/infinite/assets/files';
     public $js = [
-        'infinite-scroll.js',
+        'infinite-list-view.js',
     ];
 
     public $depends = [

@@ -3,7 +3,7 @@
 namespace mgcode\infinite;
 
 use mgcode\helpers\ArrayHelper;
-use mgcode\infinite\assets\InfiniteScrollAsset;
+use mgcode\infinite\assets\InfiniteListViewAsset;
 
 class ListView extends \yii\widgets\ListView
 {
@@ -102,8 +102,8 @@ class ListView extends \yii\widgets\ListView
             'data-autoload-on-first' => (int) $this->autoloadOnFirst,
         ]);
 
-        InfiniteScrollAsset::register($this->getView());
-        $this->getView()->registerJs("$('.infinity-pagination').infiniteScroll();");
+        InfiniteListViewAsset::register($this->getView());
+        $this->getView()->registerJs("$('.infinity-pagination').infiniteListView();");
     }
 
     /**

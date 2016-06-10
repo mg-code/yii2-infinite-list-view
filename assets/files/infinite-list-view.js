@@ -1,5 +1,5 @@
 (function ($) {
-    $.fn.infiniteScroll = function (method) {
+    $.fn.infiniteListView = function (method) {
         if (methods[method]) {
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
         } else if (typeof method === 'object' || !method) {
@@ -157,6 +157,7 @@
                     // Update page state
                     methods.replaceState.apply($e, [title, url]);
                     scrollIsReady = true;
+                    $e.trigger('infiniteListView.afterLoad');
                 },
                 complete: function () {
                     $pagination.removeClass('loading');
