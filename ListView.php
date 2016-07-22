@@ -39,6 +39,7 @@ class ListView extends \yii\widgets\ListView
     public function init()
     {
         parent::init();
+        $this->registerTranslations();
         $this->initOptions();
     }
 
@@ -128,5 +129,20 @@ class ListView extends \yii\widgets\ListView
 
         $this->_pagerInstance = \Yii::createObject($pager);
         return $this->_pagerInstance;
+    }
+
+    /**
+     * Registers translations
+     */
+    protected function registerTranslations()
+    {
+        $i18n = \Yii::$app->i18n;
+        if($i18n) {
+            $i18n->translations['mgcode/infinite'] = [
+                'class' => 'yii\i18n\PhpMessageSource',
+                'sourceLanguage' => 'en-US',
+                'basePath' => '@mgcode/infinite/messages',
+            ];
+        }
     }
 }
