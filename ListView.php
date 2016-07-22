@@ -137,7 +137,7 @@ class ListView extends \yii\widgets\ListView
     protected function registerTranslations()
     {
         $i18n = \Yii::$app->i18n;
-        if($i18n) {
+        if($i18n && !array_key_exists('mgcode/infinite', $i18n->translations)) {
             $i18n->translations['mgcode/infinite'] = [
                 'class' => 'yii\i18n\PhpMessageSource',
                 'sourceLanguage' => 'en-US',
