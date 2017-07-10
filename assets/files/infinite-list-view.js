@@ -14,6 +14,7 @@
     var defaults = {
         stopEvery: null,
         autoloadOnFirst: true,
+        updatePageHistory: true,
         clickCounter: 0,
         firstLoaded: false
     };
@@ -28,9 +29,12 @@
                 $e.data('initialized', true);
 
                 // init settings
+                var stopEvery = $e.attr('data-stop-every'),
+                    updatePageHistory = $e.attr('data-update-page-history');
                 var settings = $.extend({}, defaults, {
-                        stopEvery: $e.attr('data-stop-every') ? parseInt($e.attr('data-stop-every')) : null,
-                        autoloadOnFirst: $e.attr('data-autoload-on-first') == "1"
+                        stopEvery: stopEvery ? parseInt(stopEvery) : null,
+                        autoloadOnFirst: $e.attr('data-autoload-on-first') == "1",
+                        updatePageHistory: updatePageHistory === undefined || updatePageHistory == "1"
                     } || {});
 
                 $e.data('settings', settings);
@@ -102,7 +106,7 @@
                 url = $pagination.find('a').attr('href'),
                 isPrev = $pagination.hasClass('prev');
 
-            if(typeof resetCounter == 'undefined') {
+            if (typeof resetCounter == 'undefined') {
                 resetCounter = false;
             }
 
@@ -146,7 +150,7 @@
                         if (navigationNext) {
                             $itemsContainer.after(navigationNext);
                         }
-                        if(resetCounter) {
+                        if (resetCounter) {
                             settings.clickCounter = 0;
                         } else {
                             settings.clickCounter++;
@@ -155,7 +159,9 @@
                     }
 
                     // Update page state
-                    methods.replaceState.apply($e, [title, url]);
+                    if (settings.updatePageHistory) {
+                        methods.replaceState.apply($e, [title, url]);
+                    }
                     scrollIsReady = true;
                     $e.trigger('infiniteListView.afterLoad');
                 },

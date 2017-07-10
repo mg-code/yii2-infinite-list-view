@@ -23,6 +23,11 @@ class ListView extends \yii\widgets\ListView
     public $autoloadOnFirst = true;
 
     /**
+     * @var bool Whether to update page history on navigation
+     */
+    public $updatePageHistory = true;
+
+    /**
      * @var string the layout that determines how different sections of the list view should be organized.
      * The following tokens will be replaced with the corresponding section contents:
      * - `{pagerTop}`: the pager top. See [[renderPagerTop()]].
@@ -101,6 +106,7 @@ class ListView extends \yii\widgets\ListView
         $this->options = array_merge($this->options, [
             'data-stop-every' => $this->stopEvery ? (int) $this->stopEvery : null,
             'data-autoload-on-first' => (int) $this->autoloadOnFirst,
+            'data-update-page-history' => (int) $this->updatePageHistory,
         ]);
 
         InfiniteListViewAsset::register($this->getView());
@@ -137,7 +143,7 @@ class ListView extends \yii\widgets\ListView
     protected function registerTranslations()
     {
         $i18n = \Yii::$app->i18n;
-        if($i18n && !array_key_exists('mgcode/infinite', $i18n->translations)) {
+        if ($i18n && !array_key_exists('mgcode/infinite', $i18n->translations)) {
             $i18n->translations['mgcode/infinite'] = [
                 'class' => 'yii\i18n\PhpMessageSource',
                 'sourceLanguage' => 'en-US',
